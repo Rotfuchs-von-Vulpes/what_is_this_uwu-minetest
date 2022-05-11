@@ -16,12 +16,6 @@ local function split (str, sep)
 	return t
 end
 
-function what_is_this_uwu.split_item_name(item_name)
-	local splited = split(item_name, ':')
-
-	return splited[1], splited[2]
-end
-
 local char_width = {
 	A = 12,
 	B = 10,
@@ -79,7 +73,7 @@ local char_width = {
 char_width[' '] = 5
 char_width['_'] = 9
 
-function is_strange(str)
+local function is_strange(str)
 	for char in str:gmatch'.' do
 		if char == '' then
 			return true
@@ -87,6 +81,44 @@ function is_strange(str)
 	end
 
 	return false
+end
+
+local function string_to_pixels(str)
+	local size = 0
+
+	str:gsub('.', function(char)
+		local pixels = char_width[char]
+
+		if pixels then
+			size = size + pixels
+		else
+			size = size + 14
+		end
+	end)
+
+	return size
+end
+
+local function inventorycube(img1, img2, img3)
+	if not img1 then return '' end
+
+	img2 = img2 or img1
+	img3 = img3 or img1
+
+	img1 = img1..'^[resize:16x16'
+	img2 = img2..'^[resize:16x16'
+	img3 = img3..'^[resize:16x16'
+
+	return "[inventorycube"..
+		"{"..img1:gsub("%^","&")..
+		"{"..img2:gsub("%^","&")..
+		"{"..img3:gsub("%^","&")
+end
+
+function what_is_this_uwu.split_item_name(item_name)
+	local splited = split(item_name, ':')
+
+	return splited[1], splited[2]
 end
 
 function what_is_this_uwu.destrange(str)
@@ -112,38 +144,6 @@ function what_is_this_uwu.destrange(str)
 	end)
 
 	return str
-end
-
-function string_to_pixels(str)
-	local size = 0
-
-	str:gsub('.', function(char)
-		local pixels = char_width[char]
-
-		if pixels then
-			size = size + pixels
-		else
-			size = size + 14
-		end
-	end)
-
-	return size
-end
-
-function inventorycube(img1, img2, img3)
-	if not img1 then return '' end
-
-	img2 = img2 or img1
-	img3 = img3 or img1
-
-	img1 = img1..'^[resize:16x16'
-	img2 = img2..'^[resize:16x16'
-	img3 = img3..'^[resize:16x16'
-
-	return "[inventorycube"..
-		"{"..img1:gsub("%^","&")..
-		"{"..img2:gsub("%^","&")..
-		"{"..img3:gsub("%^","&")
 end
 
 function what_is_this_uwu.register_player(player, name)
@@ -197,7 +197,7 @@ end
 function what_is_this_uwu.get_node_tiles(node_name)
 	local node = minetest.registered_nodes[node_name]
 
-	if not node then
+	if not node or not node.tiles then
 		return 'ignore', 'node', false
 	end
 
