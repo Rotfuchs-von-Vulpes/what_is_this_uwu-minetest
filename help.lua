@@ -161,6 +161,8 @@ function what_is_this_uwu.remove_player(name)
 end
 
 function what_is_this_uwu.get_pointed_thing(player)
+	if not what_is_this_uwu.players_set[player:get_player_name()] then return end
+
 	-- get player position
 	local player_pos = player:get_pos()
 	local eye_height = player:get_properties().eye_height
@@ -270,7 +272,6 @@ function what_is_this_uwu.show(player, meta, form_view, node_description, node_n
 		size = string_to_pixels(mod_name)
 	end
 
-
 	player:hud_change(
 		meta:get_string('wit:background_middle'),
 		'scale',
@@ -320,6 +321,8 @@ function what_is_this_uwu.show(player, meta, form_view, node_description, node_n
 end
 
 function what_is_this_uwu.unshow(player, meta)
+	if not meta then return end
+
 	meta:set_string('wit:pointed_thing', 'ignore')
 
 	player:hud_change(
