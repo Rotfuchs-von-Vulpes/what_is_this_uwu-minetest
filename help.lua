@@ -115,6 +115,35 @@ local function inventorycube(img1, img2, img3)
 		"{"..img3:gsub("%^","&")
 end
 
+local function serialize(val, name, skipnewlines, depth)
+	skipnewlines = skipnewlines or false
+	depth = depth or 0
+
+	local tmp = string.rep(' ', depth)
+
+	if name then tmp = tmp .. name .. ' = ' end
+
+	if type(val) == 'table' then
+		tmp = tmp .. '{' .. (not skipnewlines and '\n' or '')
+
+		for k, v in pairs(val) do
+			tmp =  tmp .. serialize(v, k, skipnewlines, depth + 1) .. ',' .. (not skipnewlines and '\n' or '')
+		end
+
+		tmp = tmp .. string.rep(' ', depth) .. '}'
+	elseif type(val) == 'number' then
+		tmp = tmp .. tostring(val)
+	elseif type(val) == 'string' then
+		tmp = tmp .. string.format('%q', val)
+	elseif type(val) == 'boolean' then
+		tmp = tmp .. (val and 'true' or 'false')
+	else
+		tmp = tmp .. '\'[inserializeable datatype:' .. type(val) .. ']\''
+	end
+
+	return tmp
+end
+
 function what_is_this_uwu.split_item_name(item_name)
 	local splited = split(item_name, ':')
 
@@ -199,7 +228,16 @@ end
 function what_is_this_uwu.get_node_tiles(node_name)
 	local node = minetest.registered_nodes[node_name]
 
-	if not node or not node.tiles then
+	if node.groups['not_in_creative_inventory'] then
+		drop = node.drop
+		node_name = drop
+		node = minetest.registered_nodes[drop]
+		if not node then 
+			node = minetest.registered_craftitems[drop]
+		end
+	end
+
+	if not node or not node.tiles and not node.inventory_image then
 		return 'ignore', 'node', false
 	end
 
@@ -208,16 +246,9 @@ function what_is_this_uwu.get_node_tiles(node_name)
 	local mod_name, item_name = what_is_this_uwu.split_item_name(node_name)
 
 	if node.inventory_image:sub(1, 14) == '[inventorycube' then
-
 		return node.inventory_image..'^[resize:146x146', 'node', minetest.registered_nodes[node_name]
 	elseif node.inventory_image ~= '' then
-
 		return node.inventory_image..'^[resize:16x16', 'craft_item', minetest.registered_nodes[node_name]
-	elseif item_name:sub(-2) == '_a' or item_name:sub(-2) == '_b' or item_name:sub(-2) == '_c' then
-		local temp = mod_name..':'..item_name:sub(1, -3)
-		local tile_temp = minetest.registered_craftitems[temp].inventory_image
-
-		return tile_temp..'^[resize:16x16', 'craft_item', minetest.registered_nodes[node_name]
 	else
 		if not tiles[1] then
 			return '', 'node', minetest.registered_nodes[node_name]
