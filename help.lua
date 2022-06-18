@@ -228,6 +228,10 @@ end
 function what_is_this_uwu.get_node_tiles(node_name)
 	local node = minetest.registered_nodes[node_name]
 
+	if not node then
+		return 'ignore', 'node', false
+	end
+
 	if node.groups['not_in_creative_inventory'] then
 		drop = node.drop
 		node_name = drop
@@ -237,7 +241,7 @@ function what_is_this_uwu.get_node_tiles(node_name)
 		end
 	end
 
-	if not node or not node.tiles and not node.inventory_image then
+	if not node.tiles and not node.inventory_image then
 		return 'ignore', 'node', false
 	end
 
