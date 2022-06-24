@@ -154,25 +154,37 @@ function what_is_this_uwu.destrange(str)
 	local is_strange = is_strange(str);
 	local ignore = true;
 
-	local tem_str
+	local temp_str
 	if is_strange then
-		temp_str = str:sub(2, #str-2)
+		local temp_str = ''
+		local reading = true
+		local is_special = false
+		local between_parenthesis = false
+		
+		for char in str:gmatch'.' do
+			if char == '' then
+				reading = false
+			elseif reading and not between_parenthesis then
+				temp_str = temp_str..char
+			else
+				reading = true
+			end
+
+			if between_parenthesis then
+				if char == ')' then
+					between_parenthesis = false
+				end
+			else
+				if char == '(' then
+					between_parenthesis = true
+				end
+			end
+		end
+
+		return temp_str
 	else
 		return str
 	end
-
-	str = ''
-	temp_str:gsub('.', function(char)
-		if not ignore then
-			str = str..char
-		end
-
-		if char == ')' then
-			ignore = false
-		end
-	end)
-
-	return str
 end
 
 function what_is_this_uwu.register_player(player, name)
@@ -234,14 +246,16 @@ function what_is_this_uwu.get_node_tiles(node_name)
 
 	if node.groups['not_in_creative_inventory'] then
 		drop = node.drop
-		node_name = drop
-		node = minetest.registered_nodes[drop]
-		if not node then 
-			node = minetest.registered_craftitems[drop]
+		if drop and type(drop) == 'string' then
+			node_name = drop
+			node = minetest.registered_nodes[drop]
+			if not node then 
+				node = minetest.registered_craftitems[drop]
+			end
 		end
 	end
 
-	if not node.tiles and not node.inventory_image then
+	if not node or not node.tiles and not node.inventory_image then
 		return 'ignore', 'node', false
 	end
 
