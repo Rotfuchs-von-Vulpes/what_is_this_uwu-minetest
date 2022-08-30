@@ -190,14 +190,20 @@ end
 function what_is_this_uwu.register_player(player, name)
 	if not what_is_this_uwu.players_set[name] then
 		table.insert(what_is_this_uwu.players, player)
-		what_is_this_uwu.players_set[name] = #what_is_this_uwu.players
+		what_is_this_uwu.players_set[name] = true 
 	end
 end
 
 function what_is_this_uwu.remove_player(name)
 	if what_is_this_uwu.players_set[name] then
-		table.remove(what_is_this_uwu.players, what_is_this_uwu.players_set[name])
-		what_is_this_uwu.players_set[name] = nil
+		what_is_this_uwu.players_set[name] = false
+
+		for i, player in ipairs(what_is_this_uwu.players) do
+			if player == name then
+				table.remove(what_is_this_uwu.players, i)
+				break
+			end
+		end
 	end
 end
 

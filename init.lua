@@ -104,7 +104,7 @@ minetest.register_chatcommand('wituwu', {
 			what_is_this_uwu.remove_player(name)
 			what_is_this_uwu.unshow(player, player:get_meta())
 		else
-			what_is_this_uwu.register_player(name)
+			what_is_this_uwu.register_player(player, name)
 		end
 
 		return true, 'Option flipped'
