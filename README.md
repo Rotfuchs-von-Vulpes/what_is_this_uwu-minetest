@@ -6,13 +6,13 @@ A mod that says at the top of your screen what you're looking at.
 
 ## Screenshots:
 
-![](./textures/tree.png)
+![](./prints/tree.png)
 
-![](./textures/bed.png)
+![](./prints/bed.png)
 
-![](./textures/door.png)
+![](./prints/door.png)
 
-![](./textures/water.png)
+![](./prints/water.png)
 
 ## Chatcommands
 

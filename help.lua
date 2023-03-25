@@ -299,17 +299,17 @@ function what_is_this_uwu.show_background(player, meta)
 	player:hud_change(
 		meta:get_string('wit:background_left'),
 		'text',
-		'left_side.png'
+		'wit_left_side.png'
 	)
 	player:hud_change(
 		meta:get_string('wit:background_middle'),
 		'text',
-		'middle.png'
+		'wit_middle.png'
 	)
 	player:hud_change(
 		meta:get_string('wit:background_right'),
 		'text',
-		'right_side.png'
+		'wit_right_side.png'
 	)
 end
 
