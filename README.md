@@ -3,6 +3,8 @@
 A mod that says at the top of your screen what you're looking at.
 Modified by kebabmaneater to be centered and have the tool shown.
 
+Also supports Extended Tooltips https://content.minetest.net/packages/Wuzzy/tt/
+
 ## Screenshots:
 
 ![](./prints/dirt_with_grass.png)
