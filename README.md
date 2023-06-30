@@ -9,7 +9,7 @@ Modified by kebabmaneater to be centered and have the tool shown.
 
 ![](./prints/grass.png)
 
-![](./prints/water.png)
+![](./prints/water_source.png)
 
 ## Chatcommands
 
