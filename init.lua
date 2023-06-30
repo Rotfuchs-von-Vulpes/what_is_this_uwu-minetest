@@ -38,15 +38,31 @@ minetest.register_on_joinplayer(function(player)
 		scale = {x = 0.3, y = 0.3},
 		number = 0xffffff,
 		alignment = {x = 1},
-		offset = {x = 0, y = 29},
+		offset = {x = 0, y = 22}
 	})
+
 	local mod_id = player:hud_add({
 		hud_elem_type = "text",
 		position = {x = 0.5, y = 0},
 		scale = {x = 0.3, y = 0.3},
 		number = 0xff3c0a,
 		alignment = {x = 1},
-		offset = {x = 0, y = 46},
+		offset = {x = 0, y = 37},
+		style = 2
+	})
+	local best_tool = player:hud_add({
+		hud_elem_type = "image",
+		position = {x = 0.5, y = 0},
+		scale = {x = 1, y = 1},
+		alignment = {x = 1, y = 0},
+		offset = {x = 0, y = 51}
+	})
+	local tool_in_hand = player:hud_add({
+		hud_elem_type = "image",
+		position = {x = 0.5, y = 0},
+		scale = {x = 1, y = 1},
+		alignment = {x = 1, y = 0},
+		offset = {x = 0, y = 51}
 	})
 
 	meta:set_string('wit:background_left', background_id_left)
@@ -55,6 +71,8 @@ minetest.register_on_joinplayer(function(player)
 	meta:set_string('wit:image', image_id)
 	meta:set_string('wit:name', name_id)
 	meta:set_string('wit:mod', mod_id)
+	meta:set_string('wit:best_tool', best_tool)
+	meta:set_string('wit:tool_in_hand', tool_in_hand)
 	meta:set_string('wit:pointed_thing', 'ignore')
 	meta:set_string('wit:item_type_in_pointer', 'node')
 
@@ -73,8 +91,9 @@ minetest.register_globalstep(function()
 		if pointed_thing then
 			local node = minetest.get_node(pointed_thing.under)
 			local node_name = node.name
-
-			if meta:get_string('wit:pointed_thing') ~= node_name then
+			local current_tool = player:get_wielded_item():get_name()
+			
+			if meta:get_string('wit:pointed_thing') ~= node_name or current_tool ~= what_is_this_uwu.prev_tool[player:get_player_name()] then
 				local form_view, item_type, node_definition = what_is_this_uwu.get_node_tiles(node_name, meta)
 
 				if not node_definition then
@@ -86,6 +105,7 @@ minetest.register_globalstep(function()
 				local node_description = what_is_this_uwu.destrange(node_definition.description)
 				local mod_name, _ = what_is_this_uwu.split_item_name(node_name)
 
+				what_is_this_uwu.prev_tool[player:get_player_name()] = current_tool
 				what_is_this_uwu.show(player, meta, form_view, node_description, node_name, item_type, mod_name)
 			end
 		else

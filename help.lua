@@ -1,6 +1,7 @@
 local what_is_this_uwu = {
 	players = {},
-	players_set = {}
+	players_set = {},
+	prev_tool = {}
 }
 
 local function split (str, sep)
@@ -20,8 +21,8 @@ local char_width = {
 	A = 12,
 	B = 10,
 	C = 13,
-	D = 12, 
-	E = 11, 
+	D = 12,
+	E = 11,
 	F = 9,
 	G = 13,
 	H = 12,
@@ -46,8 +47,8 @@ local char_width = {
 	a = 10,
 	b = 8,
 	c = 8,
-	d = 9, 
-	e = 9, 
+	d = 9,
+	e = 9,
 	f = 5,
 	g = 9,
 	h = 9,
@@ -86,7 +87,7 @@ end
 local function string_to_pixels(str)
 	local size = 0
 
-	str:gsub('.', function(char)
+	for char in str:gmatch"." do
 		local pixels = char_width[char]
 
 		if pixels then
@@ -94,7 +95,7 @@ local function string_to_pixels(str)
 		else
 			size = size + 14
 		end
-	end)
+	end
 
 	return size
 end
@@ -320,6 +321,10 @@ function what_is_this_uwu.show(player, meta, form_view, node_description, node_n
 
 	meta:set_string('wit:pointed_thing', node_name)
 
+	if minetest.registered_items[node_name]._tt_original_description then
+		node_description = what_is_this_uwu.destrange(minetest.registered_items[node_name]._tt_original_description)
+	end
+	
 	local size
 	if #node_description >= #mod_name then
 		size = string_to_pixels(node_description)
@@ -327,22 +332,124 @@ function what_is_this_uwu.show(player, meta, form_view, node_description, node_n
 		size = string_to_pixels(mod_name)
 	end
 
+	size = size - 18
+
 	player:hud_change(
 		meta:get_string('wit:background_middle'),
 		'scale',
-		{x = size / 16 + 2, y = 2}
+		{x = size / 16 + 1.15, y = 2}
 	)
+
+	player:hud_change(
+		meta:get_string('wit:background_middle'),
+		'offset',
+		{x = -size / 2 - 9.5, y = 35}
+	)
+
 	player:hud_change(
 		meta:get_string('wit:background_right'),
 		'offset',
-		{x = size, y = 35}
+		{x = size / 2 + 25, y = 35}
+	)
+	player:hud_change(
+		meta:get_string('wit:background_left'),
+		'offset',
+		{x = -size / 2 - 25, y = 35}
 	)
 
+	player:hud_change(
+		meta:get_string('wit:image'),
+		'offset',
+		{x = -size / 2 - 12.5, y = 35}
+	)
+	player:hud_change(
+		meta:get_string('wit:name'),
+		'offset',
+		{x = -size / 2 + 16.5, y = 22}
+	)
+	player:hud_change(
+		meta:get_string('wit:mod'),
+		'offset',
+		{x = -size / 2 + 16.5, y = 37}
+	)
+	player:hud_change(
+		meta:get_string('wit:best_tool'),
+		'offset',
+		{x = -size / 2 + 16.5, y = 51}
+	)
+	player:hud_change(
+		meta:get_string('wit:tool_in_hand'),
+		'offset',
+		{x = -size / 2 + 16.5, y = 51}
+	)
+
+	local item_def = minetest.registered_items[node_name]
+	local groups = item_def.groups
+	
+	local group_index = -1
+	local index_to_image = {"wit_hand.png", "wit_spade.png", "wit_pickaxe.png", "wit_hand.png", "wit_axe.png", "wit_sword.png", "wit_hand.png"}
+	
+	for index, group in ipairs({"dig_immediate", "crumbly", "cracky", "snappy", "choppy", "fleshy", "explody"}) do
+		if groups[group] then
+			group_index = index
+			break
+		end
+	end
+	
+	local best_to_mine = index_to_image[group_index] or "wit_hand.png"
+	
+	local wielded_item = player:get_wielded_item()
+	local item_name = wielded_item:get_name()
+	
+	local tool_groups = {"pickaxe", "shovel", "sword", "axe"}
+	local correct_tool_in_hand = false
+	local any_tool_in_hand = false
+
+	local liquids = {"default:water_source", "default:river_water_source", "default:lava_source",}
+	if table.concat(liquids, ","):find(node_name) then
+		best_to_mine = "wit_bucket.png"
+		if item_name == "bucket:bucket_empty" then
+			correct_tool_in_hand = true
+		else
+			correct_tool_in_hand = false
+		end
+	else
+		for _, tool_group in ipairs(tool_groups) do
+			if minetest.get_item_group(item_name, tool_group) > 0 then
+				any_tool_in_hand = true
+				if (tool_group == "pickaxe" and group_index == 3) or
+				   (tool_group == "shovel" and group_index == 2) or
+				   (tool_group == "sword" and group_index == 6) or
+				   (tool_group == "axe" and group_index == 5) then
+					correct_tool_in_hand = true
+					break
+				end
+			end
+		end
+	
+		if not any_tool_in_hand and (group_index ~= 3 and group_index ~= 2 and group_index ~= 6 and group_index ~= 5) then
+			correct_tool_in_hand = true
+		end
+	end
+	
+	local correct_tool_image = correct_tool_in_hand and "wit_checkmark.png" or "wit_nope.png"
+
+	player:hud_change(
+		meta:get_string('wit:best_tool'),
+		'text',
+		best_to_mine
+	)
+	player:hud_change(
+		meta:get_string('wit:tool_in_hand'),
+		'text',
+		correct_tool_image
+	)
 	player:hud_change(
 		meta:get_string('wit:image'),
 		'text',
 		form_view
 	)
+
 	player:hud_change(
 		meta:get_string('wit:name'),
 		'text',
@@ -408,6 +515,16 @@ function what_is_this_uwu.unshow(player, meta)
 	)
 	player:hud_change(
 		meta:get_string('wit:mod'),
+		'text',
+		''
+	)
+	player:hud_change(
+		meta:get_string('wit:best_tool'),
+		'text',
+		''
+	)
+	player:hud_change(
+		meta:get_string('wit:tool_in_hand'),
 		'text',
 		''
 	)
