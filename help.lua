@@ -246,6 +246,7 @@ end
 
 function what_is_this_uwu.get_node_tiles(node_name)
 	local node = minetest.registered_nodes[node_name]
+	local node_definition = node
 
 	if not node then
 		return 'ignore', 'node', false
@@ -262,7 +263,7 @@ function what_is_this_uwu.get_node_tiles(node_name)
 		end
 	end
 
-	if not node or not node.tiles and not node.inventory_image then
+	if not node or (not node.tiles and not node.inventory_image) then
 		return 'ignore', 'node', false
 	end
 
@@ -271,12 +272,12 @@ function what_is_this_uwu.get_node_tiles(node_name)
 	local mod_name, item_name = what_is_this_uwu.split_item_name(node_name)
 
 	if node.inventory_image:sub(1, 14) == '[inventorycube' then
-		return node.inventory_image..'^[resize:146x146', 'node', minetest.registered_nodes[node_name]
+		return node.inventory_image..'^[resize:146x146', 'node', node_definition
 	elseif node.inventory_image ~= '' then
-		return node.inventory_image..'^[resize:16x16', 'craft_item', minetest.registered_nodes[node_name]
+		return node.inventory_image..'^[resize:16x16', 'craft_item', node_definition
 	else
 		if not tiles[1] then
-			return '', 'node', minetest.registered_nodes[node_name]
+			return '', 'node', node_definition
 		end
 
 		tiles[3] = tiles[3] or tiles[1]
@@ -292,7 +293,7 @@ function what_is_this_uwu.get_node_tiles(node_name)
 			tiles[6] = tiles[6].name
 		end
 
-		return inventorycube(tiles[1], tiles[6], tiles[3]), 'node', minetest.registered_nodes[node_name]
+		return inventorycube(tiles[1], tiles[6], tiles[3]), 'node', node_definition
 	end
 end
 
@@ -337,7 +338,7 @@ function what_is_this_uwu.show(player, meta, form_view, node_description, node_n
 	player:hud_change(
 		meta:get_string('wit:background_middle'),
 		'scale',
-		{x = size / 16 + 1.15, y = 2}
+		{x = size / 16 + 1.5, y = 2}
 	)
 
 	player:hud_change(
@@ -349,7 +350,7 @@ function what_is_this_uwu.show(player, meta, form_view, node_description, node_n
 	player:hud_change(
 		meta:get_string('wit:background_right'),
 		'offset',
-		{x = size / 2 + 25, y = 35}
+		{x = size / 2 + 30, y = 35}
 	)
 	player:hud_change(
 		meta:get_string('wit:background_left'),
