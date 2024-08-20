@@ -165,7 +165,9 @@ function what_is_this_uwu.destrange(str)
 		for char in str:gmatch'.' do
 			if char == '' then
 				reading = false
-			elseif reading and not between_parenthesis then
+			elseif char == "\n" then 
+				return temp_str
+			elseif reading and not between_parenthesis and char ~= "(" then
 				temp_str = temp_str..char
 			else
 				reading = true
@@ -275,7 +277,7 @@ function what_is_this_uwu.get_node_tiles(node_name)
 		return node.inventory_image..'^[resize:146x146', 'node', node_definition
 	elseif node.inventory_image ~= '' then
 		return node.inventory_image..'^[resize:16x16', 'craft_item', node_definition
-	else
+	elseif tiles then
 		if not tiles[1] then
 			return '', 'node', node_definition
 		end
