@@ -171,4 +171,12 @@ function M:show()
 	end
 end
 
+function M:destroy()
+    for _, id in pairs(self.hud) do
+        if self.player and self.player:is_player() then
+            self.player:hud_remove(id)
+        end
+    end
+end
+
 return M

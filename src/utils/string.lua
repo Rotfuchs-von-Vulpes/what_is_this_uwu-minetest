@@ -1,3 +1,10 @@
+local minetest = minetest
+local modpath = minetest.get_modpath("what_is_this_uwu")
+local compat = dofile(modpath .. "/src/utils/compat.lua")
+local compat_cache = {
+    get_desc_from_name = {}
+}
+
 local M = {}
 
 local DEFAULT_CHAR_WIDTH = 14
@@ -148,13 +155,26 @@ function M.get_desc_from_name(node_name, mod_name)
 		desc = def.description
 	end
 	if not desc or desc == "" then
+		local drop = def.drop
+		local test = M.get_desc_from_name(drop, mod_name)
+		desc = test and test or node_name
 		desc = node_name
 	end
 	desc = M.get_first_line(desc)
 
-	if mod_name == "pipeworks" then
-		desc = desc:gsub("%{$", "")
-	end
+    if next(compat_cache.get_desc_from_name) == nil then
+        for _, value in pairs(compat) do
+            if value.string then
+                if value.string.get_desc_from_name then
+                    table.insert(compat_cache.get_desc_from_name, value.string.get_desc_from_name)
+                end
+            end
+        end
+    end
+
+    for _, func in pairs(compat_cache.get_desc_from_name) do
+        desc = func(desc, mod_name)
+    end
 
 	return desc
 end

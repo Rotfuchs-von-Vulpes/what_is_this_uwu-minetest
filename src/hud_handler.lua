@@ -14,7 +14,11 @@ local function on_join(player)
 end
 
 local function on_leave(player)
-	M.huds[player:get_player_name()] = nil
+    local name = player:get_player_name()
+    if M.huds[name] then
+        M.huds[name]:destroy()
+        M.huds[name] = nil
+    end
 end
 
 local function update_all_huds(dtime)

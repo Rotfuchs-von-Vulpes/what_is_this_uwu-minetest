@@ -55,6 +55,6 @@ do
 			return ""
 		end
 
-		return string.format("^[progressbar(%.1f)(%s)[%s]", percent, hex, text)
+		return string.format("progressbar(%.1f)(%s)[%s]", percent, hex, text)
 	end
 end
