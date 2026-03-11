@@ -5,7 +5,7 @@ return {
                 if mod_name == "pipeworks" then
                     return node_name:gsub("%{$", "")
                 end
-                return mod_name
+                return node_name
             end
         }
     }
