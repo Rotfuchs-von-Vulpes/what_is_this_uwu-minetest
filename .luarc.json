@@ -1,5 +1,15 @@
 {
-  "Lua.workspace.library": {
-    "/mnt/sdb/code/minetest-lsp-api": true
-  }
+    "workspace": {
+        "library": [
+            "/mnt/sdc/code/.library/luanti-api",
+            "/usr/share/luanti/builtin"
+        ],
+        "checkThirdParty": false
+    },
+    "diagnostics": {
+        "globals": ["minetest", "core", "DIR_DELIM"]
+    },
+    "runtime": {
+        "version": "LuaJIT"
+    }
 }
